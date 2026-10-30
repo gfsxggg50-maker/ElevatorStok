@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ElevatorStok • Продажа лифтовых запчастей</title>
+  <meta name="description" content="ElevatorStok — продажа лифтовых запчастей. Покупай и бронируй товары напрямую в Telegram." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #07070b;
+      --bg2: #0e0e16;
+      --card: #12121c;
+      --card-hover: #181824;
+      --border: rgba(255,255,255,0.06);
+      --text: #f0f0f5;
+      --muted: #8b8b9e;
+      --accent: #5b8cff;
+      --accent2: #7c5cff;
+      --green: #3dd68c;
+      --orange: #ff9f43;
+      --radius: 16px;
+      --shadow: 0 20px 50px rgba(0,0,0,0.45);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    .bg-glow {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% -10%, rgba(91,140,255,0.18), transparent),
+        radial-gradient(ellipse 60% 40% at 90% 10%, rgba(124,92,255,0.12), transparent),
+        radial-gradient(ellipse 50% 30% at 50% 100%, rgba(61,214,140,0.06), transparent);
+    }
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black, transparent);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      background: rgba(7,7,11,0.75);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      gap: 16px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+    .logo-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border-radius: 8px;
+      font-size: 14px;
+      color: #fff;
+    }
+    .logo span { color: var(--accent); }
+
+    .nav {
+      display: flex;
+      gap: 4px;
+      background: rgba(255,255,255,0.04);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover { color: var(--text); }
+    .nav-btn.active {
+      background: rgba(91,140,255,0.15);
+      color: var(--accent);
+    }
+
+    .tg-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #2aabee, #229ed9);
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .tg-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(42,171,238,0.35);
+    }
+
+    .burger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+    }
+    .burger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text);
+      border-radius: 2px;
+    }
+
+    .section {
+      display: none;
+      padding: 48px 0 80px;
+      animation: fadeIn 0.35s ease;
+    }
+    .section.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      padding-top: 32px;
+      min-height: 420px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(91,140,255,0.12);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(91,140,255,0.2);
+    }
+    .hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.9rem, 4.2vw, 2.9rem);
+      font-weight: 700;
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .hero-desc {
+      color: var(--muted);
+      font-size: 1.05rem;
+      max-width: 440px;
+      margin-bottom: 28px;
+    }
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 12px 22px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(91,140,255,0.3);
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(91,140,255,0.4);
+    }
+    .btn-ghost {
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.09);
+    }
+    .btn-full { width: 100%; }
+    .btn-green {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(46,204,113,0.25);
+    }
+    .btn-green:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(46,204,113,0.35);
+    }
+    .btn-orange {
+      background: linear-gradient(135deg, #ff9f43, #ee8130);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(255,159,67,0.25);
+    }
+    .btn-orange:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(255,159,67,0.35);
+    }
+
+    .hero-visual {
+      position: relative;
+      height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .floating-card {
+      position: absolute;
+      width: 180px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+    }
+    .card-1 { top: 20px; left: 10%; animation: float 6s ease-in-out infinite; }
+    .card-2 { top: 80px; right: 5%; animation: float 7s ease-in-out infinite 1s; }
+    .card-3 { bottom: 10px; left: 30%; animation: float 5.5s ease-in-out infinite 0.5s; }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .fc-img {
+      height: 90px;
+      background: linear-gradient(135deg, #1a1a2e, #2a2a40);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+    .fc-img::after {
+      content: '▲';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: rgba(91,140,255,0.25);
+    }
+    .fc-title {
+      height: 10px;
+      width: 70%;
+      background: rgba(255,255,255,0.12);
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    .fc-price {
+      height: 8px;
+      width: 40%;
+      background: rgba(91,140,255,0.3);
+      border-radius: 4px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 56px;
+    }
+    .stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+    }
+    .stat-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-label {
+      color: var(--muted);
+      font-size: 0.875rem;
+      margin-top: 4px;
+    }
+
+    .section-header {
+      margin-bottom: 36px;
+      text-align: center;
+    }
+    .section-header h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .section-header p {
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    .product-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-card:hover {
+      background: var(--card-hover);
+      border-color: rgba(91,140,255,0.25);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.35);
+    }
+    .product-img {
+      position: relative;
+      aspect-ratio: 1;
+      background: #0a0a12;
+      overflow: hidden;
+    }
+    .product-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s;
+    }
+    .product-card:hover .product-img img {
+      transform: scale(1.05);
+    }
+    .product-img .placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      color: rgba(91,140,255,0.2);
+      background: linear-gradient(135deg, #0e0e18, #161622);
+    }
+    .stock-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      color: var(--green);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(61,214,140,0.3);
+    }
+    .stock-badge.soon {
+      color: var(--orange);
+      border-color: rgba(255,159,67,0.3);
+    }
+    .product-body {
+      padding: 16px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .product-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .product-price {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-top: auto;
+      padding-top: 8px;
+    }
+    .product-price.free { color: var(--muted); font-weight: 500; font-size: 0.9rem; }
+
+    .empty-state {
+      text-align: center;
+      padding: 64px 20px;
+      display: none;
+    }
+    .empty-state.show { display: block; }
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.7;
+    }
+    .empty-state h3 {
+      font-size: 1.25rem;
+      margin-bottom: 8px;
+    }
+    .empty-state p {
+      color: var(--muted);
+      max-width: 320px;
+      margin: 0 auto;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s;
+    }
+    .modal.open {
+      opacity: 1;
+      visibility: visible;
+    }
+    .modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+    }
+    .modal-content {
+      position: relative;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      max-width: 720px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow);
+      transform: scale(0.96) translateY(10px);
+      transition: transform 0.25s;
+    }
+    .modal.open .modal-content {
+      transform: scale(1) translateY(0);
+    }
+    .modal-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 5;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.1); }
+    .modal-body {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .modal-image-wrap {
+      position: relative;
+      background: #0a0a12;
+      min-height: 280px;
+    }
+    .modal-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .modal-image-wrap .placeholder {
+      width: 100%;
+      height: 100%;
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      color: rgba(91,140,255,0.2);
+    }
+    .modal-badge {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(8px);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 20px;
+    }
+    .modal-badge.available { color: var(--green); border: 1px solid rgba(61,214,140,0.3); }
+    .modal-badge.coming { color: var(--orange); border: 1px solid rgba(255,159,67,0.3); }
+    .modal-info {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-info h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .modal-desc {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+    .modal-meta {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 24px;
+      padding: 14px 0;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .meta-label {
+      display: block;
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+    .meta-value {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+    .meta-value.price { color: var(--accent); }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      position: relative;
+      z-index: 1;
+    }
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer-brand {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .footer p { color: var(--muted); font-size: 0.875rem; }
+    .footer-tg {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .footer-tg:hover { text-decoration: underline; }
+
+    @media (max-width: 860px) {
+      .hero { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+      .hero-desc { margin-left: auto; margin-right: auto; }
+      .hero-actions { justify-content: center; }
+      .hero-visual { display: none; }
+      .stats { grid-template-columns: 1fr; }
+      .modal-body { grid-template-columns: 1fr; }
+      .modal-image-wrap { min-height: 220px; }
+    }
+    @media (max-width: 640px) {
+      .nav { display: none; }
+      .nav.open {
+        display: flex;
+        position: absolute;
+        top: 64px;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        background: var(--bg2);
+        border-bottom: 1px solid var(--border);
+        padding: 12px;
+        gap: 4px;
+      }
+      .nav.open .nav-btn { width: 100%; text-align: left; padding: 12px 16px; }
+      .burger { display: flex; }
+      .tg-btn span { display: none; }
+      .header-inner { height: 60px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+  <div class="bg-grid"></div>
+
+  <header class="header">
+    <div class="container header-inner">
+      <a href="#" class="logo" onclick="showSection('home'); return false;">
+        <span class="logo-icon">▲</span>
+        Elevator<span>Stok</span>
+      </a>
+      <nav class="nav" id="nav">
+        <button class="nav-btn active" data-section="home">Главная</button>
+        <button class="nav-btn" data-section="market">Маркет</button>
+        <button class="nav-btn" data-section="soon">Скоро</button>
+      </nav>
+      <a href="https://t.me/meteologist" target="_blank" rel="noopener" class="tg-btn">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+        <span>Telegram</span>
+      </a>
+      <button class="burger" id="burger" aria-label="Меню">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section id="home" class="section active">
+      <div class="container hero">
+        <div class="hero-content">
+          <div class="badge">▲ ElevatorStok</div>
+          <h1>ElevatorStok<br><span class="gradient-text">Продажа лифтовых запчастей</span></h1>
+          <p class="hero-desc">Качественные запчасти для лифтов. Покупай то, что есть в наличии, или бронируй то, что скоро появится — всё через Telegram.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="showSection('market')">Смотреть маркет</button>
+            <button class="btn btn-ghost" onclick="showSection('soon')">Скоро в продаже</button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="floating-card card-1">
+            <div class="fc-img"></div>
+            <div class="fc-info"><div class="fc-title"></div><div class="fc-price"></div></div>
+          </div>
+          <div class="floating-card card-2">
+            <div class="fc-img"></div>
+            <div class="fc-info"><div class="fc-title"></div><div class="fc-price"></div></div>
+          </div>
+          <div class="floating-card card-3">
+            <div class="fc-img"></div>
+            <div class="fc-info"><div class="fc-title"></div><div class="fc-price"></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container stats">
+        <div class="stat">
+          <div class="stat-num" id="stat-products">0</div>
+          <div class="stat-label">Товаров в маркете</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num" id="stat-soon">0</div>
+          <div class="stat-label">Скоро появятся</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">24/7</div>
+          <div class="stat-label">Связь в Telegram</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="market" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Маркет</h2>
+          <p>Товары в наличии. Нажми на карточку → купить в Telegram</p>
+        </div>
+        <div id="market-grid" class="products-grid"></div>
+        <div id="market-empty" class="empty-state">
+          <div class="empty-icon">📦</div>
+          <h3>Пока пусто</h3>
+          <p>Скоро здесь появятся товары. Скинь карточки — добавим!</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="soon" class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Скоро в продаже</h2>
+          <p>Товары, которые готовятся к выходу. Можно забронировать прямо сейчас</p>
+        </div>
+        <div id="soon-grid" class="products-grid"></div>
+        <div id="soon-empty" class="empty-state">
+          <div class="empty-icon">🚀</div>
+          <h3>Пока ничего не анонсировано</h3>
+          <p>Как только появятся новинки — они будут здесь</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="product-modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()" aria-label="Закрыть">×</button>
+      <div class="modal-body">
+        <div class="modal-image-wrap" id="modal-img-wrap"></div>
+        <div class="modal-info">
+          <h2 id="modal-title"></h2>
+          <p id="modal-desc" class="modal-desc"></p>
+          <div class="modal-meta">
+            <div class="meta-item">
+              <span class="meta-label" id="modal-stock-label">В наличии</span>
+              <span id="modal-stock" class="meta-value"></span>
+            </div>
+            <div class="meta-item" id="modal-price-wrap">
+              <span class="meta-label">Цена</span>
+              <span id="modal-price" class="meta-value price"></span>
+            </div>
+          </div>
+          <a id="modal-action" href="#" target="_blank" rel="noopener" class="btn btn-full">Купить в Telegram</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-icon" style="width:28px;height:28px;font-size:12px;">▲</span>
+        ElevatorStok
+      </div>
+      <p>Продажа лифтовых запчастей • Связь только через Telegram</p>
+      <a href="https://t.me/meteologist" target="_blank" rel="noopener" class="footer-tg">@meteologist</a>
+    </div>
+  </footer>
+
+  <script>
+    // ============================================
+    //  ДАННЫЕ ТОВАРОВ — добавляй сюда новые
+    // ============================================
+    const products = [
+      // Примеры:
+      // {
+      //   id: "p1",
+      //   type: "market",
+      //   title: "Кнопка вызова лифта",
+      //   desc: "Оригинальная кнопка",
+      //   price: "1 500 ₽",
+      //   stock: 12,
+      //   image: "https://example.com/photo.jpg"
+      // },
+      // {
+      //   id: "s1",
+      //   type: "soon",
+      //   title: "Плата управления (новая партия)",
+      //   desc: "Ожидается поставка",
+      //   price: "",
+      //   stock: 0,
+      //   image: ""
+      // },
+    ];
+
+    const TG_USER = "meteologist";
+    const SITE_URL = window.location.href.split("#")[0].replace(/\/$/, "");
+
+    function showSection(name) {
+      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+      const section = document.getElementById(name);
+      if (section) section.classList.add("active");
+      const btn = document.querySelector(`.nav-btn[data-section="${name}"]`);
+      if (btn) btn.classList.add("active");
+      document.getElementById("nav").classList.remove("open");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    document.querySelectorAll(".nav-btn").forEach(btn => {
+      btn.addEventListener("click", () => showSection(btn.dataset.section));
+    });
+
+    document.getElementById("burger").addEventListener("click", () => {
+      document.getElementById("nav").classList.toggle("open");
+    });
+
+    function getProductLink(product) {
+      return `${SITE_URL}#product-${product.id}`;
+    }
+
+    function getBuyLink(product) {
+      const link = getProductLink(product);
+      const text = `Здравствуйте, я по поводу товара: «${link}», еще есть в наличии?`;
+      return `https://t.me/${TG_USER}?text=${encodeURIComponent(text)}`;
+    }
+
+    function getReserveLink(product) {
+      const text = `Здравствуйте, можно ли забронировать данный товар?`;
+      return `https://t.me/${TG_USER}?text=${encodeURIComponent(text)}`;
+    }
+
+    function renderProducts() {
+      const market = products.filter(p => p.type === "market");
+      const soon = products.filter(p => p.type === "soon");
+
+      document.getElementById("stat-products").textContent = market.length;
+      document.getElementById("stat-soon").textContent = soon.length;
+
+      const marketGrid = document.getElementById("market-grid");
+      const soonGrid = document.getElementById("soon-grid");
+      const marketEmpty = document.getElementById("market-empty");
+      const soonEmpty = document.getElementById("soon-empty");
+
+      marketGrid.innerHTML = "";
+      soonGrid.innerHTML = "";
+
+      if (market.length === 0) {
+        marketEmpty.classList.add("show");
+      } else {
+        marketEmpty.classList.remove("show");
+        market.forEach(p => marketGrid.appendChild(createCard(p)));
+      }
+
+      if (soon.length === 0) {
+        soonEmpty.classList.add("show");
+      } else {
+        soonEmpty.classList.remove("show");
+        soon.forEach(p => soonGrid.appendChild(createCard(p)));
+      }
+    }
+
+    function createCard(product) {
+      const card = document.createElement("div");
+      card.className = "product-card";
+      card.onclick = () => openModal(product);
+
+      const imgHtml = product.image
+        ? `<img src="${product.image}" alt="${escapeHtml(product.title)}" loading="lazy" />`
+        : `<div class="placeholder">▲</div>`;
+
+      const badge = product.type === "market"
+        ? `<span class="stock-badge">${product.stock > 0 ? product.stock + " шт" : "Нет"}</span>`
+        : `<span class="stock-badge soon">Скоро</span>`;
+
+      const priceHtml = product.price
+        ? `<div class="product-price">${escapeHtml(product.price)}</div>`
+        : `<div class="product-price free">${product.type === "soon" ? "Скоро в продаже" : "Цена по запросу"}</div>`;
+
+      card.innerHTML = `
+        <div class="product-img">
+          ${imgHtml}
+          ${badge}
+        </div>
+        <div class="product-body">
+          <div class="product-title">${escapeHtml(product.title)}</div>
+          ${priceHtml}
+        </div>
+      `;
+      return card;
+    }
+
+    function openModal(product) {
+      const modal = document.getElementById("product-modal");
+      const imgWrap = document.getElementById("modal-img-wrap");
+      const title = document.getElementById("modal-title");
+      const desc = document.getElementById("modal-desc");
+      const stock = document.getElementById("modal-stock");
+      const stockLabel = document.getElementById("modal-stock-label");
+      const price = document.getElementById("modal-price");
+      const priceWrap = document.getElementById("modal-price-wrap");
+      const action = document.getElementById("modal-action");
+
+      title.textContent = product.title;
+      desc.textContent = product.desc || (product.type === "soon"
+        ? "Товар скоро появится в продаже. Можно забронировать заранее."
+        : "Нажмите кнопку ниже, чтобы написать в Telegram.");
+
+      if (product.image) {
+        imgWrap.innerHTML = `<img src="${product.image}" alt="${escapeHtml(product.title)}" /><div class="modal-badge ${product.type === "market" ? "available" : "coming"}">${product.type === "market" ? "В наличии" : "Скоро"}</div>`;
+      } else {
+        imgWrap.innerHTML = `<div class="placeholder">▲</div><div class="modal-badge ${product.type === "market" ? "available" : "coming"}">${product.type === "market" ? "В наличии" : "Скоро"}</div>`;
+      }
+
+      if (product.type === "market") {
+        stockLabel.textContent = "В наличии";
+        stock.textContent = product.stock > 0 ? product.stock + " шт" : "Нет в наличии";
+        action.textContent = "Купить в Telegram";
+        action.className = "btn btn-full btn-green";
+        action.href = getBuyLink(product);
+      } else {
+        stockLabel.textContent = "Статус";
+        stock.textContent = "Скоро в продаже";
+        action.textContent = "Забронировать в Telegram";
+        action.className = "btn btn-full btn-orange";
+        action.href = getReserveLink(product);
+      }
+
+      if (product.price) {
+        priceWrap.style.display = "block";
+        price.textContent = product.price;
+      } else {
+        priceWrap.style.display = "none";
+      }
+
+      modal.classList.add("open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      const modal = document.getElementById("product-modal");
+      modal.classList.remove("open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") closeModal();
+    });
+
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function checkHash() {
+      const hash = window.location.hash;
+      if (hash.startsWith("#product-")) {
+        const id = hash.replace("#product-", "");
+        const product = products.find(p => p.id === id);
+        if (product) {
+          showSection(product.type === "market" ? "market" : "soon");
+          setTimeout(() => openModal(product), 100);
+        }
+      }
+    }
+
+    renderProducts();
+    checkHash();
+    window.addEventListener("hashchange", checkHash);
+  </script>
+</body>
+</html>
